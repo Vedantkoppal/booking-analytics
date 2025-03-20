@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script> -->
+    <title>{% block title %}Booking Analytics{% endblock %}</title>
+    <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .graph-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{% block header %}Booking Analytics Dashboard{% endblock %}</h1>
+        <div class="graph-container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>
