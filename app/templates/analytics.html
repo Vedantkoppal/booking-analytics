@@ -5,7 +5,27 @@
 {% block header %}Booking Analytics Dashboard{% endblock %}
 
 {% block content %}
-    {% include "graphs/revenue_trends.html" %}
-    {% include "graphs/cancellation_rate.html" %}
+    <!-- Revenue Trends Section -->
+    <div class="graph-container">
+        <h2>📊 Revenue Trends</h2>
+        {% include "graphs/revenue_trends.html" %}
+    </div>
 
+    <!-- Cancellation Analytics Section -->
+    <div class="graph-container">
+        <h2>❌ Cancellation Analytics</h2>
+        {% include "graphs/cancellation_rate.html" %}
+    </div>
+
+    <!-- Geographical Distribution Section -->
+    <div class="graph-container">
+        <h2>🌍 Geographical Distribution</h2>
+        {% include "graphs/geo_distribution.html" %}
+    </div>
+
+    <!-- Lead Time Analytics Section -->
+    <div class="graph-container">
+        <h2>⏱️ Lead Time Analytics</h2>
+        {% include "graphs/lead_time_analytics.html" %}
+    </div>
 {% endblock %}

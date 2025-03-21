@@ -1,15 +1,12 @@
 from fastapi import APIRouter, Query
 from fastapi.responses import HTMLResponse
 import pandas as pd
-import plotly.express as px
+import plotly.express as px 
 import plotly.io as pio
 
 # Create router
 router = APIRouter()
-
-# Load data (replace with your path)
-DATA_PATH = "data/updated_data.csv"
-df = pd.read_csv(DATA_PATH)
+from app.core.data import df
 
 ### ============================
 ### 1. Overall Cancellation Rate
@@ -20,7 +17,8 @@ def get_cancellation_rate():
         total_bookings = len(df)
         canceled_bookings = df["is_canceled"].sum()
         cancellation_rate = (canceled_bookings / total_bookings) * 100
-        html_content = f"<h4>Cancellation Rate: {cancellation_rate:.2f}%</h4>"
+        html_content = f"<h4 style='color: #B0B0C3;'>Cancellation Rate: <span style='color: #FF5733;'>{cancellation_rate:.2f}%</span></h4>"
+
     else:
         html_content = "<p>Cancellation column not found in the dataset.</p>"
 
@@ -106,7 +104,8 @@ def get_last_minute_cancellation(threshold: int = Query(2, description="Days bef
 
         summary_html = f"""
         <div style="margin-top: 10px;">
-            <h4>Last-Minute Cancellation Rate: {last_minute_rate:.2f}%</h4>
+    <h4 style='color: #B0B0C3;'>Last-Minute Cancellation Rate: <span style='color: #FF5733;'>{last_minute_rate:.2f}%</span></h4>
+
         </div>
         {graph_html}
         """
@@ -114,3 +113,92 @@ def get_last_minute_cancellation(threshold: int = Query(2, description="Days bef
         summary_html = "<p>Required columns not found in the dataset.</p>"
 
     return HTMLResponse(content=summary_html)
+
+### ===================================
+### 5. Cancellation Rate by Customer Type
+### ===================================
+@router.get("/get_cancellation_rate_customer", response_class=HTMLResponse)
+def get_cancellation_rate_customer():
+    if "is_canceled" in df.columns and "customer_type" in df.columns:
+        cancellation_rate_customer = df.groupby("customer_type")["is_canceled"].mean() * 100
+        fig = px.bar(
+            x=cancellation_rate_customer.index,
+            y=cancellation_rate_customer.values,
+            title="Cancellation Rate by Customer Type",
+            labels={"x": "Customer Type", "y": "Cancellation Rate (%)"},
+            color=cancellation_rate_customer.values,
+            color_continuous_scale="Reds",
+        )
+        graph_html = pio.to_html(fig, full_html=True, include_plotlyjs="cdn")
+    else:
+        graph_html = "<p>Required columns not found in the dataset.</p>"
+
+    return HTMLResponse(content=graph_html)
+
+### ===============================================
+### 6. Impact of Special Requests on Cancellations
+### ===============================================
+@router.get("/get_special_requests_cancellation", response_class=HTMLResponse)
+def get_special_requests_cancellation():
+    if "total_of_special_requests" in df.columns and "is_canceled" in df.columns:
+        avg_requests_canceled = df.groupby("is_canceled")["total_of_special_requests"].mean().reset_index()
+        fig = px.bar(
+            avg_requests_canceled,
+            x=["Not Canceled", "Canceled"],
+            y="total_of_special_requests",
+            title="Average Number of Special Requests: Canceled vs. Non-Canceled",
+            labels={"x": "Booking Status", "total_of_special_requests": "Average Special Requests"},
+            color="total_of_special_requests",
+            color_continuous_scale="Blues",
+        )
+        graph_html = pio.to_html(fig, full_html=True, include_plotlyjs="cdn")
+    else:
+        graph_html = "<p>Required columns not found in the dataset.</p>"
+
+    return HTMLResponse(content=graph_html)
+
+### ===================================
+### 7. Cancellation Rate by Market Segment
+### ===================================
+@router.get("/get_cancellation_rate_segment", response_class=HTMLResponse)
+def get_cancellation_rate_segment():
+    if "is_canceled" in df.columns and "market_segment" in df.columns:
+        cancellation_rate_segment = df.groupby("market_segment")["is_canceled"].mean() * 100
+        fig = px.bar(
+            x=cancellation_rate_segment.index,
+            y=cancellation_rate_segment.values,
+            title="Cancellation Rate by Market Segment",
+            labels={"x": "Market Segment", "y": "Cancellation Rate (%)"},
+            color=cancellation_rate_segment.values,
+            color_continuous_scale="Oranges",
+        )
+        graph_html = pio.to_html(fig, full_html=True, include_plotlyjs="cdn")
+    else:
+        graph_html = "<p>Required columns not found in the dataset.</p>"
+
+    return HTMLResponse(content=graph_html)
+
+
+### ===========================================
+### 8. Weekend vs. Weekday Booking Patterns
+### ===========================================
+@router.get("/get_weekend_weekday_patterns", response_class=HTMLResponse)
+def get_weekend_weekday_patterns():
+    if "stays_in_weekend_nights" in df.columns and "stays_in_week_nights" in df.columns:
+        total_weekend_bookings = df["stays_in_weekend_nights"].sum()
+        total_weekday_bookings = df["stays_in_week_nights"].sum()
+
+        # Plot using Plotly
+        fig = px.bar(
+            x=["Weekdays", "Weekends"],
+            y=[total_weekday_bookings, total_weekend_bookings],
+            title="Weekend vs. Weekday Booking Patterns",
+            labels={"x": "Booking Type", "y": "Number of Nights Booked"},
+            color=["Weekdays", "Weekends"],
+            color_discrete_map={"Weekdays": "skyblue", "Weekends": "orange"},
+        )
+        graph_html = pio.to_html(fig, full_html=True, include_plotlyjs="cdn")
+    else:
+        graph_html = "<p>Required columns not found in the dataset.</p>"
+
+    return HTMLResponse(content=graph_html)
