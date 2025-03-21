@@ -36,11 +36,12 @@
         <option value="daily">📅 Daily</option>
         <option value="weekly">📆 Weekly</option>
     </select>
-</div>
+</div>  
 
 <!-- Graph Container -->
 <h3>Trend Visualization</h3>
-<div id="graph-container">
+<div id="graph-container" style="width: 100%; height: 500px;">
+    <iframe id="graph-frame" src="" width="100%" height="500px" frameborder="0"></iframe>
 </div>
 
 <!-- JavaScript for Dynamic Graph Updates -->
@@ -51,20 +52,28 @@
 
         if (year) {
             // Fetch monthly graph for selected year
-            fetch(`/get_revenue_graph?trend_type=monthly_trend&year=${year}`)
-                .then((response) => response.text())
-                .then((html) => {
-                    document.getElementById("graph-container").innerHTML = html;
+            // fetch(`/get_revenue_graph?trend_type=monthly_trend&year=${year}`)
+            //     .then((response) => response.text())
+            //     .then((html) => {
+            //         // Insert HTML graph into graph-container
+            //         document.getElementById("graph-container").innerHTML = html;
 
-                    // Show month dropdown after selecting year
-                    document.getElementById("month-container").style.display = "block";
-                    document.getElementById("granularity-container").style.display = "none";
-                })
-                .catch((error) => {
-                    console.error("Error loading graph:", error);
-                    document.getElementById("graph-container").innerHTML =
-                        "<p>Error loading graph.</p>";
-                });
+            //         // Show month dropdown after selecting year
+            //         document.getElementById("month-container").style.display = "block";
+            //         document.getElementById("granularity-container").style.display = "none";
+            //     })
+            //     .catch((error) => {
+            //         console.error("Error loading graph:", error);
+            //         document.getElementById("graph-container").innerHTML =
+            //             "<p>Error loading graph.</p>";
+            //     });
+            // works2
+            document.getElementById("graph-frame").src = `/get_revenue_graph?trend_type=monthly_trend&year=${year}`;
+
+// Show month dropdown after selecting year
+            document.getElementById("month-container").style.display = "block";
+            document.getElementById("granularity-container").style.display = "none";
+
         }
     }
 
@@ -75,135 +84,43 @@
 
     // Show daily/weekly graph after selecting granularity
     function updateGranularityGraph() {
-    const year = document.getElementById("year").value;
-    const month = document.getElementById("month").value;
-    const granularity = document.getElementById("granularity").value;
+        const year = document.getElementById("year").value;
+        const month = document.getElementById("month").value;
+        const granularity = document.getElementById("granularity").value;
 
-    if (granularity) {
-        fetch(`/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`)
-            .then((response) => response.text())
-            .then((html) => {
-                // Create a temporary div to parse the returned HTML
-                // document.getElementById("graph-container").innerHTML = "";
-                // document.getElementById("graph-container").innerHTML = html;
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = html;
+        if (granularity) {
+            // fetch(`/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`)
+            //     .then((response) => {
+            //         // Check if response is HTML or JSON
+            //         const contentType = response.headers.get("content-type");
 
-                // ✅ 1. Check if the response contains a valid Plotly graph div
-                const graphDiv = tempDiv.querySelector(".plotly-graph-div");
-
-                if (graphDiv) {
-                    console.log("✅ Graph found in response, inserting it directly.");
-                    document.getElementById("graph-container").innerHTML = graphDiv.outerHTML;
-                    return; // Exit early since the graph is already rendered
-                }
-
-                // ✅ 2. If no direct graph, check for JSON data in a <script> tag
-                const plotlyScript = tempDiv.querySelector("script[type='application/json']");
-                
-                if (plotlyScript) {
-                    console.log("✅ Found Plotly script, manually updating graph.");
-                    const graphData = JSON.parse(plotlyScript.textContent);
-
-                    // Clear existing graph and render new one
-                    document.getElementById("graph-container").innerHTML = "";
-                    Plotly.react("graph-container", graphData.data, graphData.layout);
-                } else {
-                    console.error("❌ No valid graph found in the response.");
-                    document.getElementById("graph-container").innerHTML = "<p>Error loading graph.</p>";
-                }
-            })
-            .catch((error) => {
-                console.error("Error loading graph:", error);
-                document.getElementById("graph-container").innerHTML = "<p>Error loading graph.</p>";
-            });
+            //         if (contentType.includes("application/json")) {
+            //             // ✅ JSON Response (Plotly Graph)
+            //             return response.json().then((graphData) => {
+            //                 if (graphData.error) {
+            //                     console.error("❌ Error loading graph:", graphData.error);
+            //                     document.getElementById("graph-container").innerHTML = `<p>${graphData.error}</p>`;
+            //                     return;
+            //                 }
+            //                 // ✅ Use Plotly.react() to dynamically update the graph
+            //                 Plotly.react("graph-container", graphData.data, graphData.layout);
+            //             });
+            //         } else {
+            //             // ✅ HTML Response (Fallback for older methods)
+            //             return response.text().then((html) => {
+            //                 document.getElementById("graph-container").innerHTML = html;
+            //             });
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.error("❌ Error loading graph:", error);
+            //         document.getElementById("graph-container").innerHTML =
+            //             "<p>Error loading graph.</p>";
+            //     });
+            // above works 2
+            const iframeSrc = `/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`;
+            document.getElementById("graph-container").innerHTML = `
+            <iframe id="graph-frame" src="${iframeSrc}" width="100%" height="500px" frameborder="0"></iframe>`;
+        }
     }
-}
-
-// function updateGranularityGraph() {
-//     const year = document.getElementById("year").value;
-//     const month = document.getElementById("month").value;
-//     const granularity = document.getElementById("granularity").value;
-
-//     if (granularity) {
-//         fetch(`/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`)
-//             .then((response) => response.json())
-//             .then((graphData) => {
-//                 if (graphData.error) {
-//                     console.error("❌ Error loading graph:", graphData.error);
-//                     document.getElementById("graph-container").innerHTML = `<p>${graphData.error}</p>`;
-//                     return;
-//                 }
-
-//                 // ✅ Use Plotly.react() to dynamically update the graph
-//                 Plotly.react("graph-container", graphData.data, graphData.layout);
-//             })
-//             .catch((error) => {
-//                 console.error("❌ Error loading graph:", error);
-//                 document.getElementById("graph-container").innerHTML = "<p>Error loading graph.</p>";
-//             });
-//     }
-// }
-
-
-
-
-
-// function updateGranularityGraph() {
-//     const year = document.getElementById("year").value;
-//     const month = document.getElementById("month").value;
-//     const granularity = document.getElementById("granularity").value;
-
-//     if (granularity) {
-//         fetch(`/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`)
-//             .then((response) => response.text())
-//             .then((html) => {
-//                 // ✅ Insert the returned HTML directly into the graph container
-//                 document.getElementById("graph-container").innerHTML = html;
-
-//                 // ✅ Find and re-execute any script inside the returned HTML
-//                 const scriptTags = document
-//                     .getElementById("graph-container")
-//                     .getElementsByTagName("script");
-
-//                 for (let i = 0; i < scriptTags.length; i++) {
-//                     const script = document.createElement("script");
-//                     script.type = scriptTags[i].type;
-//                     if (scriptTags[i].textContent) {
-//                         script.textContent = scriptTags[i].textContent;
-//                     }
-//                     document.body.appendChild(script);
-//                     document.body.removeChild(script);
-//                 }
-//             })
-//             .catch((error) => {
-//                 console.error("❌ Error loading graph:", error);
-//                 document.getElementById("graph-container").innerHTML = "<p>Error loading graph.</p>";
-//             });
-//     }
-// }
-
-
-// function updateGranularityGraph() {
-//     const year = document.getElementById("year").value;
-//     const month = document.getElementById("month").value;
-//     const granularity = document.getElementById("granularity").value;
-
-//     if (granularity) {
-//         fetch(`/get_revenue_graph?trend_type=${granularity}&year=${year}&month=${month}`)
-//             .then((response) => response.text())
-//             .then((html) => {
-//                 // ✅ Directly replace the graph container content with the returned HTML
-//                 document.getElementById("graph-container").innerHTML = html;
-//             })
-//             .catch((error) => {
-//                 console.error("Error loading graph:", error);
-//                 document.getElementById("graph-container").innerHTML = "<p>Error loading graph.</p>";
-//             });
-//     }
-// }
-
-
-
-
 </script>
