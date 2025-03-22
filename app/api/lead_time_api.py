@@ -79,8 +79,8 @@ def get_lead_time_by_hotel_type():
 @router.get("/get_lead_time_cancel_vs_non_cancel", response_class=HTMLResponse)
 def get_lead_time_cancel_vs_non_cancel():
     if "lead_time" in df.columns and "is_canceled" in df.columns:
-        canceled_lead_time = df[df["is_canceled"] == 1]["lead_time"]
-        non_canceled_lead_time = df[df["is_canceled"] == 0]["lead_time"]
+        # canceled_lead_time = df[df["is_canceled"] == 1]["lead_time"]
+        # non_canceled_lead_time = df[df["is_canceled"] == 0]["lead_time"]
 
         # Create histogram plot using Plotly
         fig = px.histogram(

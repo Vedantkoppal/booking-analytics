@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
-
+import sqlite3
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -10,5 +10,13 @@ def create_app() -> FastAPI:
     )
     return app
 
-
+# template engine
 templates = Jinja2Templates(directory="app/templates")
+
+# database
+DB_PATH = "data/test.db"
+DB_URI = f'sqlite:///{DB_PATH}'
+
+
+
+
