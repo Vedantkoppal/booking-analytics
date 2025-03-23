@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Query History{% endblock %}
+
+{% block header %}Query History{% endblock %}
+
+{% block content %}
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #555;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #333;
+        color: white;
+    }
+    .empty-message {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #aaa;
+    }
+</style>
+
+<h3 style="text-align: center; margin-top: 20px; color: #ddd;">Recent Queries</h3>
+<div id="history-container">
+    <table id="history-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Question</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody id="history-body">
+            <!-- Data will be dynamically populated -->
+        </tbody>
+    </table>
+    <div id="empty-message" class="empty-message" style="display: none;">No history found.</div>
+</div>
+
+<script>
+    async function fetchQueryHistory() {
+        const response = await fetch("/get_query_history");
+        const data = await response.json();
+        const historyBody = document.getElementById("history-body");
+        const emptyMessage = document.getElementById("empty-message");
+
+        historyBody.innerHTML = ""; // Clear previous data
+
+        if (data.history.length > 0) {
+            data.history.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.timestamp}</td>
+                        <td>${item.question}</td>
+                        <td>${item.answer}</td>
+                    </tr>`;
+                historyBody.innerHTML += row;
+            });
+            emptyMessage.style.display = "none";
+        } else {
+            emptyMessage.style.display = "block";
+        }
+    }
+
+    window.onload = fetchQueryHistory;
+</script>
+{% endblock %}

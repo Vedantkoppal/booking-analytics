@@ -13,10 +13,4 @@ def create_app() -> FastAPI:
 # template engine
 templates = Jinja2Templates(directory="app/templates")
 
-# database
-DB_PATH = "data/test.db"
-DB_URI = f'sqlite:///{DB_PATH}'
-
-
-
 

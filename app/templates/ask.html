@@ -65,7 +65,7 @@
 </style>
 
 <div class="chat-container" id="chat-container">
-    <div class="bot-msg chat-bubble">Hello! How can I help you today? 😊</div>
+    <div class="bot-msg chat-bubble">Ask a query on dataset !</div>
 </div>
 
 <div class="input-container">
@@ -96,8 +96,6 @@
             
             if (data.answer) {
                 appendMessage("bot", data.answer);
-            } else {
-                appendMessage("bot", "Sorry, I couldn't understand that. 😢");
             }
         } catch (error) {
             console.error("Error fetching response:", error);

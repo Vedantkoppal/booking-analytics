@@ -4,9 +4,9 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import json
-
+from app.core.data_config import GROUPED_DATA
 # Paths to data
-REVENUE_DATA_PATH = "data/grouped_data.json"
+REVENUE_DATA_PATH = GROUPED_DATA
 
 # Load grouped revenue data from JSON
 revenue_data = None
