@@ -24,15 +24,13 @@ embed_model = HuggingFaceEmbedding(model_name="all-MiniLM-L6-v2")
 # engine to connect to db
 engine_llm = create_engine(DB_URI)
 sql_database = SQLDatabase(
-    engine=engine_llm,
-    include_tables=["my_table"]
+    engine=engine_llm
     )
 
 
 # llm-db core engine
 query_engine = NLSQLTableQueryEngine(
     sql_database=sql_database,
-    tables=["my_table"],
     llm=llm,
     embed_model=embed_model,
     timeout=200
