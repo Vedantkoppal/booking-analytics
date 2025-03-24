@@ -59,7 +59,14 @@ pip install -r requirements.txt
 
 ---
 
-### Step 5: Run the Application
+### Step 5: Create SqLite Data Base File
+```bash
+python create_db.py
+```
+
+---
+
+### Step 6: Run the Application
 ```bash
 uvicorn app.main:app --reload
 ```
